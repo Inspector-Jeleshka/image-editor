@@ -1,10 +1,8 @@
-﻿using System.Drawing;
-
-namespace ImageEditing
+﻿namespace ImageEditing
 {
 	public class Image
 	{
-		private string path = null!;
+		private readonly string path = null!;
 		private int fileSize;
 		private int pixelArrayOffset;
 		private DIBHeader header;
@@ -54,6 +52,9 @@ namespace ImageEditing
 		}
 
 
+		public string Path => path;
+		public int FileSize => fileSize;
+		public DIBHeader Header => header;
 		public int RowSize => (int)Math.Ceiling(header.bitsPerPixel * header.bmpWidth / 32d) * 4;
 
 
@@ -283,7 +284,7 @@ namespace ImageEditing
 				Blue = normalize(blue);
 			}
 		}
-		private struct DIBHeader
+		public struct DIBHeader
 		{
 			public readonly int headerSize = 40;
 			public int bmpWidth;
