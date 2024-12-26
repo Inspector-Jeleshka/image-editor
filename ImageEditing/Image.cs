@@ -1,4 +1,6 @@
-﻿namespace ImageEditing
+﻿using System.Drawing;
+
+namespace ImageEditing
 {
 	public class Image
 	{
@@ -178,9 +180,26 @@
 					int green = pixelArray[i, j].Green + value;
 					int blue = pixelArray[i, j].Blue + value;
 
-					Func<int, byte> normalize = (value) => { if (value > 255) return 255; if (value < 0) return 0; return (byte)value; };
+					pixelArray[i, j] = new(red, green, blue);
+				}
+		}
 
-					pixelArray[i, j] = new(normalize(red), normalize(green), normalize(blue));
+		public void EditContrast(double value)
+		{
+			if (value < -254)
+				throw new ArgumentOutOfRangeException(nameof(value), "Less than -254");
+			if (value > 258)
+				throw new ArgumentOutOfRangeException(nameof(value), "Greater than 258");
+			double k = 259d * (value + 255d) / (255d * (259d - value));
+
+			for (int i = 0; i < header.bmpHeight; i++)
+				for (int j = 0; j < header.bmpWidth; j++)
+				{
+					int red = (int)(k * (pixelArray[i, j].Red - 128) + 128);
+					int green = (int)(k * (pixelArray[i, j].Green - 128) + 128);
+					int blue = (int)(k * (pixelArray[i, j].Blue - 128) + 128);
+
+					pixelArray[i, j] = new(red, green, blue);
 				}
 		}
 
@@ -248,6 +267,20 @@
 				Red = red;
 				Green = green;
 				Blue = blue;
+			}
+			public Pixel(int red, int green, int blue)
+			{
+				Func<int, byte> normalize = (value) =>
+				{
+					if (value > 255)
+						return 255;
+					if (value < 0)
+						return 0;
+					return (byte)value;
+				};
+				Red = normalize(red);
+				Green = normalize(green);
+				Blue = normalize(blue);
 			}
 		}
 		private struct DIBHeader
